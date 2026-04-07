@@ -10,6 +10,8 @@ from urllib.parse import quote
 import requests
 from colorama import Fore, Style, init
 
+import http_client
+
 REST_COUNTRIES_BASE = "https://restcountries.com/v3.1/name"
 
 init(autoreset=True)
@@ -65,13 +67,13 @@ def fetch_country_by_name(name: str) -> tuple[list[dict[str, Any]] | None, str |
     path = quote(name.strip(), safe="")
     url = f"{REST_COUNTRIES_BASE}/{path}"
     try:
-        response = requests.get(url, timeout=15)
+        response = http_client.get(url, timeout=15)
     except requests.RequestException as exc:
         return None, str(exc)
 
     if response.status_code == 404:
         return None, "Страна не найдена (404)."
-    if not response.ok:
+    if not http_client.ok(response):
         return None, f"Ошибка HTTP {response.status_code}."
 
     try:
